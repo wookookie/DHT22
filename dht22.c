@@ -70,12 +70,12 @@ int main(void)
 
 		// Send out start signal
 		digitalWrite(signal, LOW);
-		delay(20);		// Stay LOW for 5~30 milliseconds
+		delay(20);					// Stay LOW for 5~30 milliseconds
 		pinMode(signal, INPUT);		// 'INPUT' equals 'HIGH' level. And signal read mode
 		delayMicroseconds(20);		// Wait for DHT22 ready signal
 
-		readReadySignal();
-		delay(2500);
+		readReadySignal();			// Read DHT22 ready signal
+		delay(2500);				// DHT22 average sensing period is 2 seconds
 	}
 
 	return 0;

@@ -1,7 +1,7 @@
 /*
  * DHT22 for Raspberry Pi with WiringPi
  * Author: Hyun Wook Choi
- * Version: 0.0.1
+ * Version: 0.0.2
  * https://github.com/ccoong7/DHT22
  */
 
@@ -12,112 +12,52 @@
 static const unsigned char signal = 18;
 
 
-void readReadySignal()
-{
-	unsigned short lowMicrosec;
-	unsigned short highMicrosec;
-	unsigned short lowSignal = 0;
-	unsigned short highSignal = 0;
-	unsigned char reliability;
-
-	for (lowMicrosec = 0; lowMicrosec < 80; lowMicrosec++)
-	{
-		if (digitalRead(signal) == LOW)
-		{
-			lowSignal++;
-		}
-
-		delayMicroseconds(1);
-	}
-
-	for (highMicrosec = 0; highMicrosec < 80; highMicrosec++)
-	{
-		if (digitalRead(signal) == HIGH)
-		{
-			highSignal++;
-		}
-
-		delayMicroseconds(1);
-	}
-
-	if (lowSignal < 75 || highSignal < 75)
-	{
-		reliability = 'x';
-	}
-
-	else
-	{
-		reliability = ' ';
-	}
-
-	printf("[Ready Signal]\tLOW: %d/%d | HIGH: %d/%d\t%c\n", lowSignal, lowMicrosec, highSignal, highMicrosec, reliability);
-}
-
-
-void readData()
-{
-	unsigned short lowMicrosec;
-	unsigned short highMicrosec;
-	unsigned short lowSignal = 0;
-	unsigned short highSignal = 0;
-	unsigned char reliability;
-
-	for (lowMicrosec = 0; lowMicrosec < 50; lowMicrosec++)
-	{
-		if (digitalRead(signal) == LOW)
-		{
-			lowSignal++;
-		}
-
-		delayMicroseconds(1);
-	}
-
-	for (highMicrosec = 0; highMicrosec < 30; highMicrosec++)
-	{
-		if (digitalRead(signal) == HIGH)
-		{
-			highSignal++;
-		}
-			
-		delayMicroseconds(1);
-	}
-
-	printf("[Data Signal]\tLOW: %d/%d | HIGH: %d/%d\n\n", lowSignal, lowMicrosec, highSignal, highMicrosec);
-}
-
 
 // This function just display signal state
 // LOW = 0, HIGH = 1
 // Check for natural signal length without delay() function
-void readDataTest()
+void readSignalBinary()
 {
-	unsigned char s;
-	unsigned char row = 0;
+	unsigned short bin = 0;
+	unsigned short binCount = 0;
+	unsigned short pbin = 0;
+	unsigned short row = 0;
 
-	for (unsigned short i = 0; i < 500; i++)
+	for (unsigned short i = 0; i < 3000; i++)
 	{
 		if (digitalRead(signal) == LOW)
 		{
-			s = 0;
+			bin = 0;
 		}
 
 		else
 		{
-			s = 1;
+			bin = 1;
 		}
 
-		printf("%d ", s);
-		row++;
 
-		if (row >= 100)
+		// Just for readability
+		binCount++;
+
+		if (binCount%5 == 0)
 		{
-			printf("\n");
-			row = 0;
+			printf(" ");
 		}
+
+		if (bin != pbin)
+		{
+			pbin = bin;
+			printf("\n");
+
+			binCount = 0;
+		}
+
+		printf("%u", bin);
 	}
 
-	printf("\n");
+	printf("\n\n\n");
 }
+
 
 
 int main(void)
@@ -137,11 +77,9 @@ int main(void)
 		digitalWrite(signal, LOW);
 		delay(20);					// Stay LOW for 5~30 milliseconds
 		pinMode(signal, INPUT);		// 'INPUT' equals 'HIGH' level. And signal read mode
-		delayMicroseconds(20);		// Wait for DHT22 ready signal
 
-		readReadySignal();			// Read DHT22 ready signal
-		readDataTest();
-		delay(2500);				// DHT22 average sensing period is 2 seconds
+		readSignalBinary();
+		delay(2000);				// DHT22 average sensing period is 2 seconds
 	}
 
 	return 0;

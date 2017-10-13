@@ -14,12 +14,13 @@ static const unsigned char signal = 18;
 
 void readReadySignal()
 {
-	unsigned short microsec;
+	unsigned short lowMicrosec;
+	unsigned short highMicrosec;
 	unsigned short lowSignal = 0;
 	unsigned short highSignal = 0;
 	unsigned char reliability;
 
-	for (microsec = 0; microsec < 80; microsec++)
+	for (lowMicrosec = 0; lowMicrosec < 80; lowMicrosec++)
 	{
 		if (digitalRead(signal) == LOW)
 		{
@@ -29,7 +30,7 @@ void readReadySignal()
 		delayMicroseconds(1);
 	}
 
-	for (microsec = 0; microsec < 80; microsec++)
+	for (highMicrosec = 0; highMicrosec < 80; highMicrosec++)
 	{
 		if (digitalRead(signal) == HIGH)
 		{
@@ -49,14 +50,44 @@ void readReadySignal()
 		reliability = ' ';
 	}
 
-	printf("[RESULT] LOW: %d | HIGH: %d | Microsec: %d  %c\n", lowSignal, highSignal, microsec, reliability);
+	printf("[Ready Signal]\tLOW: %d/%d | HIGH: %d/%d\t%c\n", lowSignal, lowMicrosec, highSignal, highMicrosec, reliability);
+}
+
+
+void readData()
+{
+	unsigned short lowMicrosec;
+	unsigned short highMicrosec;
+	unsigned short lowSignal = 0;
+	unsigned short highSignal = 0;
+	unsigned char reliability;
+
+	for (lowMicrosec = 0; lowMicrosec < 50; lowMicrosec++)
+	{
+		if (digitalRead(signal) == LOW)
+		{
+			lowSignal++;
+		}
+
+		delayMicroseconds(1);
+	}
+
+	for (highMicrosec = 0; highMicrosec < 30; highMicrosec++)
+	{
+		if (digitalRead(signal) == HIGH)
+		{
+			highSignal++;
+		}
+			
+		delayMicroseconds(1);
+	}
+
+	printf("[Data Signal]\tLOW: %d/%d | HIGH: %d/%d\n\n", lowSignal, lowMicrosec, highSignal, highMicrosec);
 }
 
 
 int main(void)
 {
-	unsigned char i;
-
 	// GPIO Initialization
 	if (wiringPiSetupGpio() == -1)
 	{
@@ -64,7 +95,7 @@ int main(void)
 		return -1;
 	}
 
-	for (i = 0; i < 10; i++)
+	for (unsigned char i = 0; i < 10; i++)
 	{
 		pinMode(signal, OUTPUT);
 
@@ -75,8 +106,19 @@ int main(void)
 		delayMicroseconds(20);		// Wait for DHT22 ready signal
 
 		readReadySignal();			// Read DHT22 ready signal
+		readData();
 		delay(2500);				// DHT22 average sensing period is 2 seconds
 	}
+
+	printf("Without start signal ---\n");
+
+	for (unsigned char i = 0; i < 5; i++)
+	{
+		readReadySignal();
+		readData();
+		delay(2500);
+	}
+
 
 	return 0;
 }

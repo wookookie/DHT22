@@ -86,6 +86,40 @@ void readData()
 }
 
 
+// This function just display signal state
+// LOW = 0, HIGH = 1
+// Check for natural signal length without delay() function
+void readDataTest()
+{
+	unsigned char s;
+	unsigned char row = 0;
+
+	for (unsigned short i = 0; i < 500; i++)
+	{
+		if (digitalRead(signal) == LOW)
+		{
+			s = 0;
+		}
+
+		else
+		{
+			s = 1;
+		}
+
+		printf("%d ", s);
+		row++;
+
+		if (row >= 100)
+		{
+			printf("\n");
+			row = 0;
+		}
+	}
+
+	printf("\n");
+}
+
+
 int main(void)
 {
 	// GPIO Initialization
@@ -106,19 +140,9 @@ int main(void)
 		delayMicroseconds(20);		// Wait for DHT22 ready signal
 
 		readReadySignal();			// Read DHT22 ready signal
-		readData();
+		readDataTest();
 		delay(2500);				// DHT22 average sensing period is 2 seconds
 	}
-
-	printf("Without start signal ---\n");
-
-	for (unsigned char i = 0; i < 5; i++)
-	{
-		readReadySignal();
-		readData();
-		delay(2500);
-	}
-
 
 	return 0;
 }

@@ -70,57 +70,6 @@ char readSignalLength()
 	}
 }
 
-// This function just display signal state
-// LOW = 0, HIGH = 1
-void readSignalBinary()
-{
-	unsigned short bin = 0;
-	unsigned short binCount = 0;
-	unsigned short pbin = 0;
-	unsigned short row = 0;
-
-	while (1)
-	{
-		if (digitalRead(signal) == LOW)
-		{
-			bin = 0;
-		}
-
-		else
-		{
-			bin = 1;
-		}
-
-
-		// Just for readability
-		binCount++;
-
-		if (binCount%5 == 0)
-		{
-			printf(" ");
-		}
-
-		if (bin != pbin)
-		{
-			pbin = bin;
-			printf("\n");
-
-			binCount = 0;
-		}
-
-		if (binCount >= 100)
-		{
-			break;
-		}
-
-		printf("%u", bin);
-		delayMicroseconds(1);
-	}
-
-	printf("\n\n\n");
-}
-
-
 
 int main(void)
 {

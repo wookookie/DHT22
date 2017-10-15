@@ -15,7 +15,6 @@ static const unsigned char signal = 18;
 
 // This function just display signal state
 // LOW = 0, HIGH = 1
-// Check for natural signal length without delay() function
 void readSignalBinary()
 {
 	unsigned short bin = 0;
@@ -58,6 +57,7 @@ void readSignalBinary()
 		}
 
 		printf("%u", bin);
+		delayMicroseconds(1);
 	}
 
 	printf("\n\n\n");

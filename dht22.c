@@ -23,7 +23,7 @@ void readSignalBinary()
 	unsigned short pbin = 0;
 	unsigned short row = 0;
 
-	for (unsigned short i = 0; i < 3000; i++)
+	while (1)
 	{
 		if (digitalRead(signal) == LOW)
 		{
@@ -50,6 +50,11 @@ void readSignalBinary()
 			printf("\n");
 
 			binCount = 0;
+		}
+
+		if (binCount >= 100)
+		{
+			break;
 		}
 
 		printf("%u", bin);

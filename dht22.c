@@ -1,7 +1,7 @@
 /*
  * DHT22 for Raspberry Pi with WiringPi
  * Author: Hyun Wook Choi
- * Version: 0.0.4
+ * Version: 0.0.5
  * https://github.com/ccoong7/DHT22
  */
 
@@ -35,13 +35,7 @@ char readData()
 
 				// Display data
 				printf("LOOP: %u\n", loop_counter);
-				printf("DATA: %04x  %04x  %04x  %04x  %04x\n\n", data[0], data[1], data[2], data[3], data[4]);
-
-				// Initialize data array for next loop
-				for (unsigned char i = 0; i < 5; i++)
-				{
-					data[i] = 0;
-				}
+				printf("DATA: %04x  %04x  %04x  %04x  %04x\n", data[0], data[1], data[2], data[3], data[4]);
 				
 				return -1;
 			}
@@ -118,6 +112,11 @@ char readData()
 
 int main(void)
 {
+	float humidity;
+	float celsius;
+	float fahrenheit;
+	short checksum;
+
 	// GPIO Initialization
 	if (wiringPiSetupGpio() == -1)
 	{
@@ -134,8 +133,44 @@ int main(void)
 		delay(20);					// Stay LOW for 5~30 milliseconds
 		pinMode(signal, INPUT);		// 'INPUT' equals 'HIGH' level. And signal read mode
 
-		readData();
-		delay(2000);				// DHT22 average sensing period is 2 seconds
+		readData();		// Read DHT22 signal
+
+		// The sum is maybe over 8 bit like this: '0001 0101 1010'.
+		// Remove the '9 bit' data using AND operator.
+		checksum = (data[0] + data[1] + data[2] + data[3]) & 0xFF;
+		printf("SUM : %04x\n", checksum);
+		
+		// If Check-sum data is correct (NOT 0x00), display humidity and temperature
+		if (data[4] == checksum && checksum != 0x00)
+		{
+			// * 256 is the same thing '<< 8' (shift).
+			humidity = ((data[0] * 256) + data[1]) / 10.0;
+			celsius = data[3] / 10.0;
+
+			// If 'data[2]' data like 1000 0000, It means minus temperature
+			if (data[2] == 0x80)
+			{
+				celsius *= -1;
+			}
+
+			fahrenheit = ((celsius * 9) / 5) + 32;
+
+			// Display all data
+			printf("TEMP: %6.2f *C (%6.2f *F) | HUMI: %6.2f %\n\n", celsius, fahrenheit, humidity);
+		}
+
+		else
+		{
+			printf("[x_x] Invalid Data. Try again.\n\n");
+		}
+
+		// Initialize data array for next loop
+		for (unsigned char i = 0; i < 5; i++)
+		{
+			data[i] = 0;
+		}
+
+		delay(2000);	// DHT22 average sensing period is 2 seconds
 	}
 
 	return 0;

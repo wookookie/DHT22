@@ -9,11 +9,11 @@
 #include <stdio.h>
 #include <wiringPi.h>
 
-static const unsigned char signal = 18;
+static const unsigned short signal = 18;
 unsigned short data[5] = {0, 0, 0, 0, 0};
 
 
-char readData()
+short readData()
 {
 	unsigned short val = 0x00;
 	unsigned short signal_length = 0;

@@ -9,11 +9,11 @@
 #include <stdio.h>
 #include <wiringPi.h>
 
-static const unsigned char signal = 18;
+static const unsigned short signal = 18;
 unsigned short data[5] = {0, 0, 0, 0, 0};
 
 
-char testSignalData()
+short testSignalData()
 {
 	unsigned short val = 0x00;
 	unsigned short signal_length = 0;
@@ -33,7 +33,7 @@ char testSignalData()
 			{
                 printf("========== END DATA ==========\n");
 
-                    // Display data
+                // Display data
                 printf("LOOP: %u\n", loop_counter);
                 printf("DATA: %04x  %04x  %04x  %04x  %04x\n", data[0], data[1], data[2], data[3], data[4]);
 

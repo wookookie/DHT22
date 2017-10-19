@@ -37,4 +37,5 @@ $ ./dht22.out
 ## Reference
 Visit my blog and get more information. (in Korean)
 - [How to use DHT22?](http://blog.naver.com/ccoong7/221119421273)
-- How DHT22 works and how to process data?
+- [How DHT22 works and sending out data?](http://blog.naver.com/ccoong7/221119937010)
+- [How to process temperature and humidity data?](http://blog.naver.com/ccoong7/221120199514)

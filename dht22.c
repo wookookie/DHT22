@@ -1,7 +1,7 @@
 /*
  * DHT22 for Raspberry Pi with WiringPi
  * Author: Hyun Wook Choi
- * Version: 0.0.5
+ * Version: 0.1.0
  * https://github.com/ccoong7/DHT22
  */
 
@@ -9,11 +9,11 @@
 #include <stdio.h>
 #include <wiringPi.h>
 
-static const unsigned char signal = 18;
+static const unsigned short signal = 18;
 unsigned short data[5] = {0, 0, 0, 0, 0};
 
 
-char readData()
+short readData()
 {
 	unsigned short val = 0x00;
 	unsigned short signal_length = 0;
@@ -30,13 +30,7 @@ char readData()
 			// When sending data ends, high signal occur infinite.
 			// So we have to end this infinite loop.
 			if (signal_length >= 200)
-			{
-				printf("========== END DATA ==========\n");
-
-				// Display data
-				printf("LOOP: %u\n", loop_counter);
-				printf("DATA: %04x  %04x  %04x  %04x  %04x\n", data[0], data[1], data[2], data[3], data[4]);
-				
+			{				
 				return -1;
 			}
 
@@ -53,24 +47,18 @@ char readData()
 			if (signal_length < 10)
 			{
 				// Unstable signal
-				printf("SIGNAL [0*]\t%u\n", signal_length);
-
 				val <<= 1;		// 0 bit. Just shift left
 			}
 
 			else if (signal_length < 30)
 			{
 				// 26~28us means 0 bit
-				printf("SIGNAL [0]\t%u\n", signal_length);
-
 				val <<= 1;		// 0 bit. Just shift left
 			}
 
 			else if (signal_length < 85)
 			{
-				// 70us means 1 bit
-				printf("SIGNAL [1]\t%u\n", signal_length);
-				
+				// 70us means 1 bit	
 				// Shift left and input 0x01 using OR operator
 				val <<= 1;
 				val |= 1;
@@ -79,7 +67,6 @@ char readData()
 			else
 			{
 				// Unstable signal
-				printf("[x_x] HIGH signal occurred too long.\t%u\n", signal_length);
 				return -1;
 			}
 
@@ -98,8 +85,6 @@ char readData()
 		// If 8 bit data input complete
 		if (val_counter >= 8)
 		{
-			printf("[DATA] %04x\n", val);
-
 			// 8 bit data input to the data array
 			data[(loop_counter / 8) - 1] = val;
 
@@ -138,7 +123,6 @@ int main(void)
 		// The sum is maybe over 8 bit like this: '0001 0101 1010'.
 		// Remove the '9 bit' data using AND operator.
 		checksum = (data[0] + data[1] + data[2] + data[3]) & 0xFF;
-		printf("SUM : %04x\n", checksum);
 		
 		// If Check-sum data is correct (NOT 0x00), display humidity and temperature
 		if (data[4] == checksum && checksum != 0x00)

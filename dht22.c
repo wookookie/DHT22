@@ -1,7 +1,7 @@
 /*
  * DHT22 for Raspberry Pi with WiringPi
  * Author: Hyun Wook Choi
- * Version: 0.1.0
+ * Version: 0.1.1
  * https://github.com/ccoong7/DHT22
  */
 
@@ -9,9 +9,16 @@
 #include <stdio.h>
 #include <wiringPi.h>
 
-static const unsigned short signal = 18;
+static unsigned short signal;
 unsigned short data[5] = {0, 0, 0, 0, 0};
 
+void setPinNum()
+{
+	printf("============================================\n");
+	printf("[?_?] Enter a signal pin number : ");
+	scanf("%d", &signal);
+	printf("============================================\n\n");
+}
 
 short readData()
 {
@@ -108,6 +115,8 @@ int main(void)
 		printf("[x_x] GPIO Initialization FAILED.\n");
 		return -1;
 	}
+
+	setPinNum();
 
 	for (unsigned char i = 0; i < 10; i++)
 	{

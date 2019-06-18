@@ -3,10 +3,10 @@
  * Original code by Hyun Wook Choi: https://github.com/ccoong7/DHT22
  *
  * dht22_json.c
- * by d5c0d3 : https://github.com/d5c0d3/DHT22
- * Version: 0.1.0
+ * 
+ * Version: 0.2.0
  *
- * Features of this adapted version:
+ * Features of this adapted version by d5c0d3:
  * - next to temperature and humidity export of
  *     - datetime of reading,
  *     - seconds to successfully read,
@@ -155,7 +155,7 @@ int main(void)
 			
 			// * 256 is the same thing '<< 8' (shift).
 			humidity = ((data[0] * 256) + data[1]) / 10.0;
-			celsius = data[3] / 10.0;
+			celsius = (((data[2] & 0x7F)*256) + data[3]) / 10.0; //changed acc. Juergen Wolf-Hofer
 
 			// If 'data[2]' data like 1000 0000, It means minus temperature
 			if (data[2] == 0x80)

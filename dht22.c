@@ -1,8 +1,8 @@
 /*
  * DHT22 for Raspberry Pi with WiringPi
- * Author: Hyun Wook Choi
- * Version: 0.1.0
- * https://github.com/ccoong7/DHT22
+ * Original Author: Hyun Wook Choi
+ * Original Version: 0.1.0
+ * Forked from: https://github.com/ccoong7/DHT22
  */
 
 
@@ -19,18 +19,18 @@ short readData()
 	unsigned short signal_length = 0;
 	unsigned short val_counter = 0;
 	unsigned short loop_counter = 0;
-	
+
 	while (1)
 	{
 		// Count only HIGH signal
 		while (digitalRead(signal) == HIGH)
 		{
 			signal_length++;
-			
+
 			// When sending data ends, high signal occur infinite.
 			// So we have to end this infinite loop.
 			if (signal_length >= 200)
-			{				
+			{
 				return -1;
 			}
 
@@ -58,7 +58,7 @@ short readData()
 
 			else if (signal_length < 85)
 			{
-				// 70us means 1 bit	
+				// 70us means 1 bit
 				// Shift left and input 0x01 using OR operator
 				val <<= 1;
 				val |= 1;
@@ -123,13 +123,21 @@ int main(void)
 		// The sum is maybe over 8 bit like this: '0001 0101 1010'.
 		// Remove the '9 bit' data using AND operator.
 		checksum = (data[0] + data[1] + data[2] + data[3]) & 0xFF;
-		
+
 		// If Check-sum data is correct (NOT 0x00), display humidity and temperature
 		if (data[4] == checksum && checksum != 0x00)
 		{
 			// * 256 is the same thing '<< 8' (shift).
 			humidity = ((data[0] * 256) + data[1]) / 10.0;
-			celsius = data[3] / 10.0;
+			
+			// found that with the original code at temperatures > 25.4 degrees celsius
+			// the temperature would print 0.0 and increase further from there.
+			// Eventually when the actual temperature drops below 25.4 again
+			// it would print the temperature as expected.
+			// Some research and comparisin with other C implementation suggest a
+			// different calculation of celsius.
+			//celsius = data[3] / 10.0; //original
+			celsius = (((data[2] & 0x7F)*256) + data[3]) / 10.0; //Juergen Wolf-Hofer
 
 			// If 'data[2]' data like 1000 0000, It means minus temperature
 			if (data[2] == 0x80)
@@ -141,6 +149,7 @@ int main(void)
 
 			// Display all data
 			printf("TEMP: %6.2f *C (%6.2f *F) | HUMI: %6.2f %\n\n", celsius, fahrenheit, humidity);
+			return 0;
 		}
 
 		else
